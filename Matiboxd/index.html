@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matiboxd</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="navbar__container">
+        <h1>Matiboxd</h1>
+        <form class="navbar__sexo">
+            <input type="text" name="text" id="search" placeholder="Buscar pelicula..."><button>X</button>
+        </form>
+        
+    </header>
+    <main class="main__container">
+        <p>Busca la pelicula que se cante el forro del orto en esta pagina</p>
+        <div class="movies__container">
+        </div>
+    </main>
+
+    <div id="movie-modal" class="movie__overlay hidden">
+        <div class="modal__content">
+            <button id="modal-close" class="modal__close-btn">X</button>
+            <img id="modal-img" src="https://postercity.com.ar/wp-content/uploads/2019/11/Star-Wars-60-x-90-low.jpg" class="movie__modal" alt="Poster">
+            <div class="modal__info">
+                <h2 id="modal-title" class="movie__title">Pelicula X</h2>
+                <p class="modal__meta">📅 <span id="modal-date"></span> | ⭐ <span id="modal-rating"></span>/10</p>
+                <p id="modal-overview">Acá va a ir la sinopsis...</p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
