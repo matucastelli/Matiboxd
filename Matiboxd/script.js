@@ -1,6 +1,6 @@
 const API_KEY = "8d79725bdfff0156fea3564a664caeba";
 
-const formulario = document.querySelector('.navbar__sexo');
+const navLinks = document.querySelector('.navbar__links');
 const busquedas = document.querySelector('#search');
 const contenedorPeliculas = document.querySelector('.movies__container');
 const modal = document.querySelector("#movie-modal");
@@ -10,6 +10,84 @@ const modalTitle = document.querySelector("#modal-title");
 const modalDate = document.querySelector("#modal-date");
 const modalRating = document.querySelector("#modal-rating");
 const modalOverview = document.querySelector("#modal-overview");
+const btnMenu = document.querySelector("#btn-menu");
+const formulario = document.querySelector("#formulario");
+const menuOverlay = document.querySelector("#menu-overlay");
+const btnMiLista = document.querySelector('#btn-mi-lista');
+const logo = document.querySelector('#logo');
+
+// 2. Le agregamos el evento de clic
+logo.addEventListener('click', () => {
+    
+    // A. Volvemos a cargar las películas de la pantalla principal
+    cargarPopulares();
+    
+    // B. Limpiamos lo que haya quedado escrito en el buscador
+    busquedas.value = '';
+    
+    // C. Si el usuario estaba en celular y tenía el menú abierto, lo cerramos
+    formulario.classList.remove("menu-activo");
+    menuOverlay.classList.add("hidden");
+    btnMenu.textContent = "☰";
+});
+
+btnMiLista.addEventListener('click', (e) => {
+    e.preventDefault(); // Evitamos que la página salte
+
+    // 1. Si el menú de celular estaba abierto, lo cerramos
+    formulario.classList.remove("menu-activo");
+    menuOverlay.classList.add("hidden");
+    btnMenu.textContent = "☰";
+
+    // 2. Traemos las películas de tu bóveda
+    let miLista = JSON.parse(localStorage.getItem('matiboxd_vistas')) || [];
+
+    // 3. Limpiamos la pantalla principal
+    contenedorPeliculas.innerHTML = '';
+
+    // 4. Si la lista está vacía, mostramos un mensaje
+    if (miLista.length === 0) {
+        contenedorPeliculas.innerHTML = `
+            <h2 style="grid-column: 1 / -1; text-align: center; margin-top: 50px;">
+                Todavía no guardaste ninguna película 🍿
+            </h2>`;
+        return; // Cortamos la función acá
+    }
+
+    // 5. Si hay películas, las dibujamos una por una
+    miLista.forEach(pelicula => {
+        const tarjetaHTML = `
+            <div class="movie__card">
+                <img src="${pelicula.poster}" alt="Póster de ${pelicula.titulo}">
+                <h3>${pelicula.titulo}</h3>
+                <button class="btn-eliminar" data-id="${pelicula.id}" style="background-color: #ff4d4d; color: white;">
+                    Eliminar
+                </button>
+            </div>
+        `;
+        contenedorPeliculas.innerHTML += tarjetaHTML;
+    });
+});
+
+btnMenu.addEventListener("click", (e) => {
+    e.preventDefault(); 
+    
+    formulario.classList.toggle("menu-activo");
+    menuOverlay.classList.toggle("hidden");
+    
+    // Cambiamos el icono según si está abierto o cerrado
+    if (formulario.classList.contains("menu-activo")) {
+        btnMenu.textContent = "X";
+    } else {
+        btnMenu.textContent = "☰";
+    }
+});
+
+menuOverlay.addEventListener("click", () => {
+    formulario.classList.remove("menu-activo");
+    menuOverlay.classList.add("hidden");
+    btnMenu.textContent = "☰"; 
+});
 
 // Esta función recibe un array de películas y las dibuja en el HTML
 function mostrarPeliculas(listaDePeliculas) {
@@ -49,7 +127,7 @@ async function cargarPopulares() {
 
 cargarPopulares();
 
-formulario.addEventListener('submit', async (e) => {
+navLinks.addEventListener('submit', async (e) => {
     e.preventDefault();
     let busqueda = busquedas.value;
 

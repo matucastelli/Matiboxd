@@ -8,12 +8,14 @@
 </head>
 <body>
     <header class="navbar__container">
-        <h1>Matiboxd</h1>
-        <form class="navbar__sexo">
-            <input type="text" name="text" id="search" placeholder="Buscar pelicula..."><button>X</button>
+        <h1 id="logo">Matiboxd</h1>
+        <button id="btn-menu">☰</button>
+        <form class="navbar__links" id="formulario">
+            <input type="text" name="text" id="search" placeholder="Buscar pelicula...">
+            <a href="#" id="btn-mi-lista">Mis peliculas</a>
         </form>
-        
     </header>
+    <div id="menu-overlay" class="hidden"></div>
     <main class="main__container">
         <p>Busca la pelicula que se cante el forro del orto en esta pagina</p>
         <div class="movies__container">

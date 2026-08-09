@@ -2,7 +2,15 @@
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     margin: 0;
     padding: 0;
-    
+    box-sizing: border-box;
+}
+
+html, body {
+    overflow-x: hidden;
+}
+
+#logo {
+    cursor: pointer;
 }
 
 body {
@@ -12,9 +20,10 @@ body {
 
 .navbar__container {
     display: flex;
+    flex-direction: column; 
     padding: 1rem;
-    justify-content: center;
-    align-items: center;
+    align-items: center; 
+    position: relative; 
     border-bottom: 1px solid #E4D5B7;
 }
 
@@ -22,12 +31,81 @@ body {
     margin-top: 20px;
 }
 
-.navbar__sexo {
-    display: flex;
-    margin-left: 30px;
-    gap: 10px;
-    flex-wrap: nowrap;
+#btn-menu {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #E4D5B7;
+    cursor: pointer;
+    z-index: 1001;
+}
 
+
+/* 3. Agregá esto al final para darle estilo de botón al enlace */
+#btn-mi-lista {
+    text-decoration: none; /* Le saca el subrayado azul feo */
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    background-color: #E4D5B7;
+    color: #3F3A3A;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background 0.2s;
+    text-align: center;
+}
+
+#btn-mi-lista:hover {
+    opacity: 85%;
+}
+
+.navbar__links {
+    position: fixed;
+    top: 0;
+    right: 0; /* Lo anclamos a la derecha */
+    width: 60%; /* Ocupa un poco más de la mitad de la pantalla */
+    height: 100vh;
+    background-color: #3F3A3A; /* Usamos el color de tu fondo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px; /* Para que no quede pegado al techo */
+    gap: 20px;
+    z-index: 1000;
+    border-left: 2px solid #E4D5B7; /* Borde izquierdo para separar */
+    
+    /* Magia de la animación: lo empujamos 100% fuera de la pantalla */
+    transform: translateX(100%); 
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Clase que enciende JS para que el menú se deslice adentro */
+form.menu-activo {
+    transform: translateX(0) !important;
+}
+
+/* Achicamos un poco el buscador cuando el menú está abierto en el celular */
+form.menu-activo input {
+    max-width: 180px;
+}
+
+.navbar__links.menu-activo {
+    display: flex !important;
+    transform: translateX(0);
+}
+
+
+#menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #3f3a3acc; /* Fondo negro con opacidad */
+    z-index: 990; 
+    transition: opacity 0.3s;
 }
 
 input {
@@ -117,13 +195,13 @@ p {
 
 .modal__content {
     display: flex;
-    flex-direction: column; /* Apilamos imagen arriba y texto abajo */
+    flex-direction: column; 
     background-color: #E4D5B7;
     border-radius: 8px;
-    width: 80vw; /* Un poco más ancho en celu para aprovechar el espacio */
-    max-height: 80vh; /* Límite de altura */
-    overflow-y: auto; /* Agrega scroll si el contenido es muy largo */
-    padding: 1.5rem; /* Aire interior vital para que el texto no toque el borde */
+    width: 80vw; 
+    max-height: 80vh; 
+    overflow-y: auto; 
+    padding: 1.5rem; 
     color: #3F3A3A;
     gap: 1.5rem;
     position: relative;
@@ -178,14 +256,40 @@ p {
 
 @media (min-width: 768px) {
     .modal__content {
-        flex-direction: row; /* Ponemos la imagen a la izquierda y el texto a la derecha */
+        flex-direction: row; 
         width: 80vw;
-        max-width: 900px; /* Evitamos que sea una caja gigante en monitores grandes */
+        max-width: 900px; 
         padding: 2.5rem;
     }
 
     .modal__content img {
-        width: 300px; /* Le damos un ancho fijo al póster */
+        width: 300px; 
         height: auto;
+    }
+
+    .navbar__container {
+        flex-direction: row; 
+        justify-content: center; 
+        gap: 30px; 
+    }
+
+    #btn-menu {
+        display: none; 
+    }
+
+    #menu-overlay {
+        display: none !important; /* Nunca se muestra en PC */
+    }
+
+    .navbar__links {
+        position: static; /* Le sacamos lo flotante */
+        transform: translateX(0); /* Siempre visible */
+        width: auto;
+        height: auto;
+        flex-direction: row; /* Buscador y botón en la misma línea */
+        padding-top: 0;
+        background-color: transparent;
+        border-left: none;
+        align-items: center;
     }
 }
