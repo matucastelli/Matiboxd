@@ -16,7 +16,7 @@ const menuOverlay = document.querySelector("#menu-overlay");
 const btnMiLista = document.querySelector('#btn-mi-lista');
 const logo = document.querySelector('#logo');
 
-// 2. Le agregamos el evento de clic
+
 logo.addEventListener('click', () => {
     
     // A. Volvemos a cargar las películas de la pantalla principal
@@ -147,7 +147,8 @@ navLinks.addEventListener('submit', async (e) => {
 });
 
 contenedorPeliculas.addEventListener('click', (e) => {
-    
+    let miLista = JSON.parse(localStorage.getItem('matiboxd_vistas')) || [];
+
     if (e.target.classList.contains('btn-guardar')) {
         
         const id = e.target.getAttribute('data-id');
@@ -160,7 +161,7 @@ contenedorPeliculas.addEventListener('click', (e) => {
             poster: poster
         };
 
-        let miLista = JSON.parse(localStorage.getItem('matiboxd_vistas')) || [];
+        
 
         const peliculaYaExiste = miLista.find(peli => peli.id === id);
 
@@ -195,6 +196,12 @@ contenedorPeliculas.addEventListener('click', (e) => {
 
         modal.classList.remove("hidden");
 
+    } else if (e.target.classList.contains("btn-eliminar")) {
+        const idCapturado = e.target.getAttribute("data-id");
+        miLista = miLista.filter(pelicula => pelicula.id !== idCapturado);
+        localStorage.setItem('matiboxd_vistas', JSON.stringify(miLista));
+        
+        btnMiLista.click();
     }
 });
 
