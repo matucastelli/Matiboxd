@@ -16,45 +16,87 @@ const menuOverlay = document.querySelector("#menu-overlay");
 const btnMiLista = document.querySelector('#btn-mi-lista');
 const logo = document.querySelector('#logo');
 
+async function cargarPopulares() {
+    try {
+        const url = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=es-ES&page=1`;
+        const respuesta = await fetch(url);
+        const datos = await respuesta.json();
+        mostrarPeliculas(datos.results);
+    } catch (error) {
+        console.error("Hubo un error cargando las películas populares:", error);
+    }
+}
+
+function mostrarPeliculas(listaDePeliculas) {
+    contenedorPeliculas.innerHTML = '';
+    const fragment = document.createDocumentFragment(); 
+
+    listaDePeliculas.forEach(pelicula => {
+        const card = crearTarjetaPelicula(pelicula); 
+        fragment.appendChild(card); 
+    });
+
+    contenedorPeliculas.appendChild(fragment); 
+}
+
+function crearTarjetaPelicula(pelicula) {
+    const urlImagen = pelicula.poster_path
+        ? `https://image.tmdb.org/t/p/w500${pelicula.poster_path}`
+        : 'https://via.placeholder.com/500x750?text=Sin+Poster';
+
+    const card = document.createElement('div');
+    card.className = 'movie__card';
+
+    const img = document.createElement('img');
+    img.src = urlImagen;
+    img.alt = `Póster de ${pelicula.title}`;
+    img.dataset.sinopsis = pelicula.overview;
+    img.dataset.fecha = pelicula.release_date;
+    img.dataset.puntaje = pelicula.vote_average;
+    img.dataset.titulo = pelicula.title;
+
+    const h3 = document.createElement('h3');
+    h3.textContent = pelicula.title;
+
+    const btnGuardar = document.createElement('button');
+    btnGuardar.className = 'btn-guardar';
+    btnGuardar.textContent = 'Marcar como vista';
+    btnGuardar.dataset.id = pelicula.id;
+    btnGuardar.dataset.titulo = pelicula.title;
+    btnGuardar.dataset.poster = urlImagen;
+
+    card.appendChild(img);
+    card.appendChild(h3);
+    card.appendChild(btnGuardar);
+
+    return card;
+}
 
 logo.addEventListener('click', () => {
-    
-    // A. Volvemos a cargar las películas de la pantalla principal
     cargarPopulares();
-    
-    // B. Limpiamos lo que haya quedado escrito en el buscador
     busquedas.value = '';
-    
-    // C. Si el usuario estaba en celular y tenía el menú abierto, lo cerramos
     formulario.classList.remove("menu-activo");
     menuOverlay.classList.add("hidden");
     btnMenu.textContent = "☰";
 });
 
 btnMiLista.addEventListener('click', (e) => {
-    e.preventDefault(); // Evitamos que la página salte
-
-    // 1. Si el menú de celular estaba abierto, lo cerramos
+    e.preventDefault();
     formulario.classList.remove("menu-activo");
     menuOverlay.classList.add("hidden");
     btnMenu.textContent = "☰";
 
-    // 2. Traemos las películas de tu bóveda
     let miLista = JSON.parse(localStorage.getItem('matiboxd_vistas')) || [];
-
-    // 3. Limpiamos la pantalla principal
     contenedorPeliculas.innerHTML = '';
 
-    // 4. Si la lista está vacía, mostramos un mensaje
     if (miLista.length === 0) {
         contenedorPeliculas.innerHTML = `
             <h2 style="grid-column: 1 / -1; text-align: center; margin-top: 50px;">
                 Todavía no guardaste ninguna película 🍿
             </h2>`;
-        return; // Cortamos la función acá
+        return;
     }
 
-    // 5. Si hay películas, las dibujamos una por una
     miLista.forEach(pelicula => {
         const tarjetaHTML = `
             <div class="movie__card">
@@ -71,11 +113,9 @@ btnMiLista.addEventListener('click', (e) => {
 
 btnMenu.addEventListener("click", (e) => {
     e.preventDefault(); 
-    
     formulario.classList.toggle("menu-activo");
     menuOverlay.classList.toggle("hidden");
     
-    // Cambiamos el icono según si está abierto o cerrado
     if (formulario.classList.contains("menu-activo")) {
         btnMenu.textContent = "X";
     } else {
@@ -89,56 +129,15 @@ menuOverlay.addEventListener("click", () => {
     btnMenu.textContent = "☰"; 
 });
 
-// Esta función recibe un array de películas y las dibuja en el HTML
-function mostrarPeliculas(listaDePeliculas) {
-    contenedorPeliculas.innerHTML = ''; // Limpiamos lo que haya
-
-    listaDePeliculas.forEach(pelicula => {
-        const urlImagen = pelicula.poster_path 
-            ? `https://image.tmdb.org/t/p/w500${pelicula.poster_path}` 
-            : 'https://via.placeholder.com/500x750?text=Sin+Poster';
-
-        const tarjetaHTML = `
-            <div class="movie__card">
-                <img src="${urlImagen}" alt="Póster de ${pelicula.title}" data-sinopsis="${pelicula.overview}" data-fecha="${pelicula.release_date}" data-puntaje="${pelicula.vote_average}" data-titulo="${pelicula.title}">
-                <h3>${pelicula.title}</h3>
-                <button class="btn-guardar" data-id="${pelicula.id}" data-titulo="${pelicula.title}" data-poster="${urlImagen}">
-                    Marcar como vista
-                </button>
-            </div>
-        `;
-        contenedorPeliculas.innerHTML += tarjetaHTML;
-    });
-}
-
-async function cargarPopulares() {
-    try {
-        const url = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=es-ES&page=1`;
-
-        const respuesta = await fetch(url);
-        const datos = await respuesta.json();
-        
-        mostrarPeliculas(datos.results);
-    } catch (error) {
-        console.error("Hubo un error cargando las películas populares:", error);
-    }
-}
-
-
-cargarPopulares();
-
 navLinks.addEventListener('submit', async (e) => {
     e.preventDefault();
     let busqueda = busquedas.value;
 
     try {
         const url = `https://api.themoviedb.org/3/search/movie?query=${busqueda}&api_key=${API_KEY}&language=es-ES`;
-
         const respuesta = await fetch(url);
         const datos = await respuesta.json();
-
         mostrarPeliculas(datos.results);
-
     } catch (error) {
         console.error("Hubo un error con la búsqueda:", error);
     }
@@ -150,28 +149,17 @@ contenedorPeliculas.addEventListener('click', (e) => {
     let miLista = JSON.parse(localStorage.getItem('matiboxd_vistas')) || [];
 
     if (e.target.classList.contains('btn-guardar')) {
-        
         const id = e.target.getAttribute('data-id');
         const titulo = e.target.getAttribute('data-titulo');
         const poster = e.target.getAttribute('data-poster');
 
-        const peliculaParaGuardar = {
-            id: id,
-            titulo: titulo,
-            poster: poster
-        };
-
-        
-
+        const peliculaParaGuardar = { id, titulo, poster };
         const peliculaYaExiste = miLista.find(peli => peli.id === id);
 
         if (!peliculaYaExiste) {
-            
             miLista.push(peliculaParaGuardar);
-            
             localStorage.setItem('matiboxd_vistas', JSON.stringify(miLista));
             
-        
             e.target.textContent = '¡Vista! 🍿';
             e.target.style.backgroundColor = '#E4D5B7';
             e.target.style.color = '#3F3A3A';
@@ -181,30 +169,22 @@ contenedorPeliculas.addEventListener('click', (e) => {
             alert('¡Ya marcaste esta película como vista!');
         }
     } else if (e.target.tagName === "IMG") {
-
-        const sinopsis = e.target.getAttribute("data-sinopsis");
-        const fecha = e.target.getAttribute("data-fecha");
-        const puntaje = e.target.getAttribute("data-puntaje");
-        const titulo = e.target.getAttribute("data-titulo");
-
-        modalTitle.textContent = titulo;
-        modalDate.textContent = fecha;
+        modalTitle.textContent = e.target.getAttribute("data-titulo");
+        modalDate.textContent = e.target.getAttribute("data-fecha");
         modalImg.src = e.target.src;
-        modalOverview.textContent = sinopsis;
-        modalRating.textContent = puntaje; 
-
-
+        modalOverview.textContent = e.target.getAttribute("data-sinopsis");
+        modalRating.textContent = e.target.getAttribute("data-puntaje"); 
         modal.classList.remove("hidden");
-
     } else if (e.target.classList.contains("btn-eliminar")) {
         const idCapturado = e.target.getAttribute("data-id");
         miLista = miLista.filter(pelicula => pelicula.id !== idCapturado);
         localStorage.setItem('matiboxd_vistas', JSON.stringify(miLista));
-        
         btnMiLista.click();
     }
 });
 
 btnCerrarModal.addEventListener("click", () => {
     modal.classList.add("hidden");
-})
+});
+
+cargarPopulares();
